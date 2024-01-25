@@ -1,4 +1,4 @@
-# science4ml_beyondadditive
+# Beyond Additive Noise
 Structure of a very unstructured repo:
 
 - Notebook augmentations.py show how the text images are modified and distored. The augmentations were done careffuly to not disrupt the visibilty of the text and to simulate real world scenarios found in phone camera images.
@@ -25,4 +25,6 @@ Structure of a very unstructured repo:
 
 - "DCGAN.ipynb": initial code for GAN that tries to generate augmented dataset
 
-- "TPS_ResNet_BiLSTM_Attn_.ipynb": more promising Sota 
+- "TPS_ResNet_BiLSTM_Attn_.ipynb": more promising Sota
+
+- If you want the model's weight you can ask me by mail : antoine.munier@epfl.ch
