@@ -3,7 +3,7 @@ Structure of a very unstructured repo:
 
 - Notebook augmentations.py show how the text images are modified and distored. The augmentations were done careffuly to not disrupt the visibilty of the text and to simulate real world scenarios found in phone camera images.
 
-- [Gogole sheets](https://docs.google.com/spreadsheets/d/13Fl1kxpyHP2fxiZedBJW2poygm5o7gjkDrChHA_1edc/edit?usp=sharing):
+- [Google sheets](https://docs.google.com/spreadsheets/d/13Fl1kxpyHP2fxiZedBJW2poygm5o7gjkDrChHA_1edc/edit?usp=sharing):
   results for testing the sota on the augmentations
 
 - img_ground_truth.csv, img_ground_truh_train.csv: these files are a csv mapping from image name and its' label, from the IIIT5k dataset, generated using matlab. It was used for initial exploration of the task
