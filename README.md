@@ -1,28 +1,47 @@
-# Beyond Additive Noise
-Structure of a very unstructured repo:
+# Beyond Additive Noise: Evaluating Geometric Style Transfer in Scene Text Recognition
 
-- Notebook augmentations.py show how the text images are modified and distored. The augmentations were done careffuly to not disrupt the visibilty of the text and to simulate real world scenarios found in phone camera images.
+Research project on **data augmentation for Scene Text Recognition (STR)**, carried out in collaboration with **Google** and the **EPFL LIONS laboratory** (Laboratory for Information and Inference Systems).
 
-- [Google sheets](https://docs.google.com/spreadsheets/d/13Fl1kxpyHP2fxiZedBJW2poygm5o7gjkDrChHA_1edc/edit?usp=sharing):
-  results for testing the sota on the augmentations
+📄 **Full write-up: [paper.pdf](paper.pdf)**
 
-- img_ground_truth.csv, img_ground_truh_train.csv: these files are a csv mapping from image name and its' label, from the IIIT5k dataset, generated using matlab. It was used for initial exploration of the task
+## Overview
 
-- crnn-kaggle.ipynb: Kaggle provides many datasets (samples) that are useful and public. Send Your Kaggle user account and i will share what is needed.
+STR models are typically trained on synthetic data (MJSynth, SynthText) and struggle with the distortions found in real-world images — blur, noise, compression artifacts, perspective changes. This project:
 
-  **The model is the SoTa CRNN.**
+1. **Benchmarks state-of-the-art STR models** (CRNN, TPS-ResNet-BiLSTM-Attn) under realistic camera-style augmentations across five real-world datasets (IIIT5k, SVT, SVTP, CUTE80, ICDAR2015).
+2. **Retrains TPS-ResNet-BiLSTM-Attn (TRBA) from scratch on augmented synthetic data** (49M parameters, 41k iterations on 2× Tesla V100) to measure the robustness gained from training-time augmentation.
+3. **Prototypes a DCGAN** to generate augmented street-view-style training data as a generative alternative to hand-designed augmentations.
 
-  >
-  >There are also useful cells for datasetBuilding and preprocessing of the pairs (image, text) input.
-  >
-  >-> Next is to back them up as TFRecords to save time,  and share it. 
-  >
-  >This can be better optimized to gain a bit of time computation. (depends if we'll keep working with it)
+Augmentations are deliberately kept subtle — designed to simulate phone-camera and surveillance-camera conditions without making the text illegible (15 transforms across blur, noise, camera, dropout, artistic, and geometric families).
 
-- "one_epoch.h5": (If you want the model's weight you can ask me by mail : antoine.munier@epfl.ch) These are the loaded weights of one training epoch of this model. We can build our model with these pre-saved weights and continue training. 
-  Training (and preprocessing etc) it took 5 hours on Kaggle GPU T4x2.  Given the complexity of the model and the size of the data, this was expected. 
-  `  31356/Unknown - 18123s 577ms/step - loss: 1.8949 - sequence_accuracy: 0.8107`: output of model.fit()
+## Key results
 
-- "DCGAN.ipynb": initial code for GAN that tries to generate augmented dataset
+Sensitivity of the baseline TRBA model to augmentations at test time (accuracy drop, %):
 
-- "TPS_ResNet_BiLSTM_Attn_.ipynb": more promising Sota
+| Dataset | Blur | Noise | Camera | Dropout | Geometric | Combined |
+|---------|------|-------|--------|---------|-----------|----------|
+| IIIT5k  | 5.17 | 0.17  | 0.23   | 1.70    | 7.50      | 2.73     |
+| SVT     | 3.47 | 1.00  | 0.54   | 2.24    | 7.80      | 2.57     |
+| SVTP    | 16.74| 0.78  | -0.16  | 4.03    | 11.63     | 5.89     |
+| IC15    | 10.56| 1.41  | 0.36   | 4.06    | 9.00      | 4.68     |
+
+After retraining TRBA on augmented data, the clean-vs-augmented accuracy gap narrows on most datasets (e.g. IIIT5k **2.73 → 1.83**, CUTE80 **4.53 → 1.74**, IC15 **4.68 → 2.05** points), showing that training-time augmentation improves robustness to real-world distortions — despite our model being trained for only 41k iterations vs. the baseline's 300k. Detailed per-dataset benchmark results are in the [results sheet](https://docs.google.com/spreadsheets/d/13Fl1kxpyHP2fxiZedBJW2poygm5o7gjkDrChHA_1edc/edit?usp=sharing) and the paper.
+
+## Repository structure
+
+| File | Description |
+|------|-------------|
+| `paper.pdf` | Full project report: methodology, training conditions, results, limitations |
+| `augmentations.ipynb` | The 15 augmentation transforms and their visual effect on text images |
+| `TPS_ResNet_BiLSTM_Attn_.ipynb` | TRBA model — the main SOTA model benchmarked and retrained |
+| `SoA.ipynb` | State-of-the-art model evaluation across the five benchmark datasets |
+| `crnn-kaggle.ipynb` | CRNN baseline (initial SOTA model), with dataset building and preprocessing |
+| `DCGAN.ipynb` | DCGAN prototype for generating augmented training data |
+| `AugDataset.py`, `dataset.py`, `test.py` | Dataset and evaluation utilities |
+| `img_ground_truth*.csv` | Image → label mappings for IIIT5k used during initial exploration |
+
+## Authors
+
+Antoine Munier, Syrine Noamen — Department of Computer Science, EPFL.
+
+Thanks to Igor Krawczuk and the LIONS laboratory for guidance and computing resources.
